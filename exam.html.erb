@@ -1,0 +1,39 @@
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+  <h1>Web技術入門シリーズ課題</h1>
+  <% require 'pg' %>
+  <% connection = PG::connect(dbname: "goya") %>
+  <% connection.internal_encoding = "UTF-8" %>
+  <!-- <form action="indicate.cgi" method="POST">
+     下記に文字を入力してください<br><br>
+    <input type="text"  name="input" ><br>
+    <input type="submit" name="送信" >
+  </form> -->
+  <% result = connection.exec("select give_for from crops where give_for != '自家消費';") %>
+  <% data = [] %>
+  <% result.each do |record| %>
+    <%  data << "売った相手：#{record["give_for"]}" %>
+  <% end %>
+  <form action="expect_myself.cgi" method="POST">
+     下記のボタンを押すと、自家消費を除いた売った相手の情報ページに飛びます<br><br>
+     <!-- valueには、送りたいデータを代入する -->
+     <!-- name="goya"を、情報の目印とする -->
+    <input type="text" name="expect_myself" value="<%= data.join(',') %>">
+    <input type="submit" name="送信" >
+  </form>
+  <% result = connection.exec("select quality from crops where quality = false ;") %>
+  <% data = [] %>
+  <% result.each do |record| %>
+    <%  data << "出荷可能か否か：#{record["quality"]}" %>
+  <% end %>
+  <form action="bad.cgi" method="POST">
+     下記のボタンを押すと、ゴーヤの品質の情報ページに飛びます<br><br>
+     <!-- valueには、送りたいデータを代入する -->
+     <!-- name="goya"を、情報の目印とする -->
+    <input type="text" name="bad" value="<%= data.join(',') %>">
+    <input type="submit" name="送信" >
+  </form>
+</body>
+</html>
